@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clance Impostor Phenomenon Scale (CIPS) - Self Assessment</title>
+    <style>
+        /* 页面基础样式 - 保持干净、学术、易读 */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+            background-color: #f4f4f9; 
+            color: #333; 
+            line-height: 1.6;
+        }
+        
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 0.9em; }
+
+        /* 说明区域 */
+        .intro-box { 
+            background: #ffffff; 
+            padding: 20px; 
+            border-left: 5px solid #007bff; 
+            border-radius: 4px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+            margin-bottom: 30px; 
+        }
+
+        /* 题目卡片样式 */
+        .question-card { 
+            background: #fff; 
+            padding: 25px; 
+            margin-bottom: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03); 
+            transition: transform 0.2s;
+        }
+        .question-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        
+        .q-number { color: #007bff; font-weight: bold; font-size: 1.1em; margin-right: 8px; }
+        .q-text { font-weight: 600; font-size: 1.05em; display: inline; }
+
+        /* 选项样式 */
+        .options-container { 
+            margin-top: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+        }
+        
+        /* 桌面端改为横向排列，移动端保持纵向 */
+        @media (min-width: 600px) {
+            .options-container { flex-direction: row; justify-content: space-between; }
+            .option-label { flex: 1; text-align: center; }
+        }
+
+        .option-label { 
+            cursor: pointer; 
+            padding: 10px; 
+            background: #f8f9fa; 
+            border-radius: 6px; 
+            border: 1px solid #e9ecef;
+            transition: all 0.2s;
+            font-size: 0.9em;
+            display: flex;
+            flex-direction: column; /* 让数字和文字垂直排列 */
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .option-label:hover { background: #e2e6ea; border-color: #adb5bd; }
+        /* 选中时的样式 */
+        input[type="radio"]:checked + span { color: #007bff; font-weight: bold; }
+        input[type="radio"] { margin-bottom: 5px; cursor: pointer; }
+
+        /* 提交按钮 */
+        .btn-container { text-align: center; margin-top: 40px; margin-bottom: 60px; }
+        button { 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 15px 40px; 
+            font-size: 18px; 
+            font-weight: bold;
+            border-radius: 50px; 
+            cursor: pointer; 
+            box-shadow: 0 4px 6px rgba(0,123,255,0.2);
+            transition: transform 0.2s, background 0.3s; 
+        }
+        button:hover { background-color: #0056b3; transform: scale(1.02); }
+
+        /* 结果弹窗区域 */
+        #result-modal {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .result-content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .score-big { font-size: 48px; color: #007bff; font-weight: bold; margin: 10px 0; }
+        .instruction-text { color: #555; margin: 20px 0; font-size: 1.1em; }
+        
+        .next-btn {
+            display: inline-block;
+            text-decoration: none;
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .next-btn:hover { background: #218838; }
+
+    </style>
+</head>
+<body>
+
+    <h1>CIPS Self-Assessment</h1>
+    <div class="subtitle">Clance Impostor Phenomenon Scale</div>
+
+    <div class="intro-box">
+        <p><strong>Instructions:</strong> For each question, please select the number that best indicates how true the statement is of you. It is best to give the first response that enters your mind rather than dwelling on each statement and thinking about it over and over.</p>
+        <p><strong>Privacy Note:</strong> This test runs entirely in your browser. No data is collected or stored.</p>
+    </div>
+
+    <form id="cipsForm">
+        </form>
+
+    <div class="btn-container">
+        <button type="button" onclick="calculateScore()">Calculate Score</button>
+    </div>
+
+    <div id="result-modal">
+        <div class="result-content">
+            <h2>Assessment Complete</h2>
+            <p>Your CIPS Score:</p>
+            <div class="score-big" id="scoreDisplay">0</div>
+            
+            <div class="instruction-text">
+                <p>Please <strong>copy or remember this number</strong>.</p>
+                <p>You will need to enter it in the next step.</p>
+            </div>
+
+            <a href="https://forms.google.com/your-form-link" target="_blank" class="next-btn">
+                Proceed to Step 2 &rarr;
+            </a>
+            
+            <br><br>
+            <small style="color:#999; cursor:pointer;" onclick="document.getElementById('result-modal').style.display='none'">Close</small>
+        </div>
+    </div>
+
+    <script>
+        // 20 道完整题目数据
+        const questions = [
+            "I have often succeeded on a test or task even though I was afraid that I would not do well before I undertook the task.",
+            "I can give the impression that I’m more competent than I really am.",
+            "I avoid evaluations if possible and have a dread of others evaluating me.",
+            "When people praise me for something I’ve accomplished, I’m afraid I won’t be able to live up to their expectations of me in the future.",
+            "I sometimes think I obtained my present position or gained my present success because I happened to be in the right place at the right time or knew the right people.",
+            "I’m afraid people important to me may find out that I’m not as capable as they think I am.",
+            "I tend to remember the incidents in which I have not done my best more than those times I have done my best.",
+            "I rarely do a project or task as well as I’d like to do it.",
+            "Sometimes I feel or believe that my success in my life or in my job has been the result of some kind of error.",
+            "It’s hard for me to accept compliments or praise about my intelligence or accomplishments.",
+            "At times, I feel my success has been due to some kind of luck.",
+            "I’m disappointed at times in my present accomplishments and think I should have accomplished much more.",
+            "Sometimes I’m afraid others will discover how much knowledge or ability I really lack.",
+            "I’m often afraid that I may fail at a new assignment or undertaking even though I generally do well at what I attempt.",
+            "When I’ve succeeded at something and received recognition for my accomplishments, I have doubts that I can keep repeating that success.",
+            "If I receive a great deal of praise and recognition for something I’ve accomplished, I tend to discount the importance of what I’ve done.",
+            "I often compare my ability to those around me and think they may be more intelligent than I am.",
+            "I often worry about not succeeding with a project or examination, even though others around me have considerable confidence that I will do well.",
+            "If I’m going to receive a promotion or gain recognition of some kind, I hesitate to tell others until it is an accomplished fact.",
+            "I feel bad and discouraged if I’m not “the best” or at least “very special” in situations that involve achievement."
+        ];
+
+        // 选项标签 (标准 CIPS 计分)
+        const scaleLabels = [
+            { val: 1, text: "Not at all true" },
+            { val: 2, text: "Rarely" },
+            { val: 3, text: "Sometimes" },
+            { val: 4, text: "Often" },
+            { val: 5, text: "Very true" }
+        ];
+
+        // 自动生成 HTML
+        const formContainer = document.getElementById('cipsForm');
+        
+        questions.forEach((qText, index) => {
+            const qNum = index + 1;
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            
+            // 构建选项 HTML
+            let optionsHTML = '';
+            scaleLabels.forEach(opt => {
+                optionsHTML += `
+                    <label class="option-label">
+                        <input type="radio" name="q${qNum}" value="${opt.val}" required>
+                        <span>${opt.val}</span>
+                        <span style="font-size:0.8em; color:#666;">${opt.text}</span>
+                    </label>
+                `;
+            });
+
+            card.innerHTML = `
+                <div>
+                    <span class="q-number">${qNum}.</span>
+                    <p class="q-text">${qText}</p>
+                </div>
+                <div class="options-container">
+                    ${optionsHTML}
+                </div>
+            `;
+            formContainer.appendChild(card);
+        });
+
+        // 算分逻辑
+        function calculateScore() {
+            const form = document.getElementById('cipsForm');
+            
+            // 检查是否全部填完
+            if (!form.checkValidity()) {
+                alert("Please answer all questions before calculating your score.");
+                // 找到第一个没填的题目并滚动过去
+                const firstInvalid = form.querySelector('input:invalid');
+                if(firstInvalid) {
+                    firstInvalid.scrollIntoView({behavior: "smooth", block: "center"});
+                }
+                return;
+            }
+
+            const formData = new FormData(form);
+            let total = 0;
+            
+            for (let [key, value] of formData.entries()) {
+                total += parseInt(value);
+            }
+
+            // 显示结果
+            document.getElementById('scoreDisplay').innerText = total;
+            document.getElementById('result-modal').style.display = 'flex';
+        }
+    </script>
+
+</body>
+</html>
